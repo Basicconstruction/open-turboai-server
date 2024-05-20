@@ -6,7 +6,7 @@ using Turbo_Auth.Handlers.Model2Key;
 using Turbo_Auth.Models.Ai.Media;
 using Turbo_Auth.Models.Ai.Video.Request;
 
-namespace Turbo_Auth.Controllers.Transfer;
+namespace Turbo_Auth.Controllers.Ai;
 
 [ApiController]
 [Authorize("vip")]

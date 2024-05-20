@@ -16,6 +16,29 @@ public class ModelController: Controller
         _modelRepository = modelRepository;
     }
 
+    [HttpPost("changeModelStatus/{modelId}")]
+    public async Task<IActionResult> ChangeModelStatus(int modelId,ChangeModelStatus changeModelStatus)
+    {
+        if (modelId != changeModelStatus.ModelId)
+        {
+            return BadRequest("不匹配的参数，操作失败");
+        }
+        try
+        {
+            await _modelRepository.SetEnableStatus(changeModelStatus.ModelId, changeModelStatus.Enable);
+        }
+        catch (Exception e)
+        {
+            return BadRequest("操作失败");
+        }
+
+        return Ok(
+        new {
+            msg = "操作成功"
+        });
+    }
+    
+
     [HttpGet]
     public async Task<List<Model>?> GetModelsWithKey([FromQuery] int? keyId)
     {
@@ -72,5 +95,19 @@ public class ModelController: Controller
         {
             return BadRequest("执行错误");
         }
+    }
+}
+
+public class ChangeModelStatus
+{
+    public int ModelId
+    {
+        get;
+        set;
+    }
+    public bool Enable
+    {
+        get;
+        set;
     }
 }

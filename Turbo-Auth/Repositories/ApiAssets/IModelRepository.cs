@@ -10,4 +10,5 @@ public interface IModelRepository
     Task AddModelAsync(string name);
     Task UpdateModelAsync(Model model);
     Task<Model?> GetModelByName(string name);
+    Task SetEnableStatus(int id,bool enable);
 }

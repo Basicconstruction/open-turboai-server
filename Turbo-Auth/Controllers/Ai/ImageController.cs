@@ -5,10 +5,9 @@ using Newtonsoft.Json;
 using Turbo_Auth.Handlers.Model2Key;
 using Turbo_Auth.Models.Ai.Image.Request;
 using Turbo_Auth.Models.Ai.Image.Response.Lcm;
-using Turbo_Auth.Models.Ai.Image.Response.Task;
 using Turbo_Auth.Models.Ai.Media;
 
-namespace Turbo_Auth.Controllers.Transfer;
+namespace Turbo_Auth.Controllers.Ai;
 
 [Authorize(Policy = "vip")]
 [ApiController]

@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Turbo_Auth.Repositories.Messages;
 
-namespace Turbo_Auth.Controllers.Sync;
+namespace Turbo_Auth.Controllers.MessageSync;
 
 [ApiController]
 [Authorize(Policy = "user")]

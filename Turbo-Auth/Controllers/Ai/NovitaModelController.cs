@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using Turbo_Auth.Handlers.Model2Key;
 using Turbo_Auth.Models.Ai.Image;
 
-namespace Turbo_Auth.Controllers.Transfer;
+namespace Turbo_Auth.Controllers.Ai;
 
 [ApiController]
 [Obsolete]

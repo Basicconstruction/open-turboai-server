@@ -7,7 +7,7 @@ using Turbo_Auth.Handlers.Model;
 using Turbo_Auth.Handlers.Model2Key;
 using Turbo_Auth.Models.Ai.Chat;
 
-namespace Turbo_Auth.Controllers.Transfer;
+namespace Turbo_Auth.Controllers.Ai;
 [Authorize(Policy = "vip")]
 [ApiController]
 [Route("api/ai")]

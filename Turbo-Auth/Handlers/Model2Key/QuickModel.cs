@@ -1,5 +1,6 @@
 ﻿using Turbo_Auth.Handlers.Group;
 using Turbo_Auth.Models.Suppliers;
+using ModelGroup = Turbo_Auth.Handlers.Group.ModelGroup;
 
 namespace Turbo_Auth.Handlers.Model2Key;
 

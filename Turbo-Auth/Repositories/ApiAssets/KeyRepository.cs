@@ -16,18 +16,18 @@ public class KeyRepository: IKeyRepository
 
     public async Task<List<SupplierKey>?> GetKeysAsync()
     {
-        return await _keyContext.SupplierKeys!.Include(k=>k.ModelFees)!.ThenInclude(f=>f.Model).ToListAsync();
+        return await _keyContext.SupplierKeys!.Include(k=>k.ModelKeyBinds)!.ThenInclude(f=>f.Model).ToListAsync();
     }
 
     public async Task<List<SupplierKey>?> GetKeysWithModelAsync(int modelId)
     {
-        var keyIds = await _keyContext.ModelFees!
+        var keyIds = await _keyContext.ModelKeyBinds!
             .Where(f => f.ModelId == modelId)
             .Select(f => f.SupplierKeyId)
             .ToListAsync();
 
         var keys = await _keyContext.SupplierKeys!
-            .Include(k => k.ModelFees)!
+            .Include(k => k.ModelKeyBinds)!
             .ThenInclude(f => f.Model)
             .Where(k => keyIds.Contains(k.SupplierKeyId))
             .ToListAsync();
@@ -38,7 +38,7 @@ public class KeyRepository: IKeyRepository
     public async Task<SupplierKey?> GetKeyByIdAsync(int id)
     {
         return await _keyContext.SupplierKeys!.Where(k => k.SupplierKeyId == id)
-            .Include(k => k.ModelFees)!
+            .Include(k => k.ModelKeyBinds)!
             .ThenInclude(f => f.Model).FirstOrDefaultAsync();
     }
 
@@ -83,16 +83,17 @@ public class KeyRepository: IKeyRepository
             innerKey.ApiKey = key.ApiKey;
             innerKey.BaseUrl = key.BaseUrl;
             innerKey.RequestIdentifier = key.RequestIdentifier;
-            var existingFees = await _keyContext.ModelFees!.Where(f => f.SupplierKeyId == key.SupplierKeyId).ToListAsync();
-            _keyContext.ModelFees!.RemoveRange(existingFees);
+            innerKey.Enable = key.Enable;
+            var existingFees = await _keyContext.ModelKeyBinds!.Where(f => f.SupplierKeyId == key.SupplierKeyId).ToListAsync();
+            _keyContext.ModelKeyBinds!.RemoveRange(existingFees);
 
-            if (key.ModelFees != null && key.ModelFees.Count != 0)
+            if (key.ModelKeyBinds != null && key.ModelKeyBinds.Count != 0)
             {
-                foreach (var fee in key.ModelFees)
+                foreach (var modelKeyBind in key.ModelKeyBinds)
                 {
-                    fee.SupplierKeyId = innerKey.SupplierKeyId; // Set the SupplierKeyId for each fee
+                    modelKeyBind.SupplierKeyId = innerKey.SupplierKeyId; // Set the SupplierKeyId for each fee
                 }
-                _keyContext.ModelFees.AddRange(key.ModelFees);
+                _keyContext.ModelKeyBinds.AddRange(key.ModelKeyBinds);
             }
 
             await _keyContext.SaveChangesAsync();

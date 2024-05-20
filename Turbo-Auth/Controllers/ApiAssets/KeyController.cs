@@ -52,11 +52,11 @@ public class KeyController: Controller
     {
         try
         {
-            if (key.ModelFees != null)
+            if (key.ModelKeyBinds != null)
             {
-                foreach (var modelFee in key.ModelFees)
+                foreach (var modelKeyBind in key.ModelKeyBinds)
                 {
-                    modelFee.Model = null;
+                    modelKeyBind.Model = null;
                 }
             }
             await _keyRepository.AddKeyAsync(key);
@@ -107,11 +107,11 @@ public class KeyController: Controller
     {
         try
         {
-            if (key.ModelFees != null)
+            if (key.ModelKeyBinds != null)
             {
-                foreach (var modelFee in key.ModelFees)
+                foreach (var modelKeyBind in key.ModelKeyBinds)
                 {
-                    modelFee.Model = null;
+                    modelKeyBind.Model = null;
                 }
             }
             await _keyRepository.UpdateKeyAsync(key);

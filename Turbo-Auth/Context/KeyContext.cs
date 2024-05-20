@@ -31,7 +31,7 @@ public partial class KeyContext : DbContext
 
         OnModelCreatingPartial(modelBuilder);
         modelBuilder.Entity<SupplierKey>().ToTable("SupplierKeys");
-        modelBuilder.Entity<ModelFee>().ToTable("ModelFees");
+        modelBuilder.Entity<ModelKeyBind>().ToTable("ModelKeyBinds");
         modelBuilder.Entity<Model>().ToTable("Models");
         modelBuilder.Entity<NovitaModel>().ToTable("NovitaModels");
 
@@ -44,7 +44,7 @@ public partial class KeyContext : DbContext
         get;
         set;
     }
-    public DbSet<ModelFee>? ModelFees
+    public DbSet<ModelKeyBind>? ModelKeyBinds
     {
         get;
         set;

@@ -2,10 +2,16 @@
 
 namespace Turbo_Auth.Models.Suppliers;
 
-public class ModelFee
+public class ModelKeyBind
 {
     [Key]
-    public int ModelFeeId
+    public int ModelKeyBindId
+    {
+        get;
+        set;
+    }
+
+    public bool Enable
     {
         get;
         set;
@@ -38,6 +44,6 @@ public class ModelFee
     }
     public override string ToString()
     {
-        return $"ModelFeeId: {ModelFeeId}, SupplierKeyId: {SupplierKeyId}, ModelId: {ModelId}, Model: {Model}, Fee: {Fee}";
+        return $"ModelKeyBindId: {ModelKeyBindId}, Enable: {Enable}, SupplierKeyId: {SupplierKeyId}, ModelId: {ModelId}, Model: {Model}, Fee: {Fee}";
     }
 }

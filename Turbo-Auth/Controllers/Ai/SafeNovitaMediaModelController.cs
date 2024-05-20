@@ -2,13 +2,14 @@
 using Turbo_Auth.Models.Ai.Media;
 using Turbo_Auth.Repositories.Novita;
 
-namespace Turbo_Auth.Controllers.Transfer;
+namespace Turbo_Auth.Controllers.Ai;
+
 [ApiController]
-[Route("api/media")]
-public class NovitaMediaModelController: Controller
+[Route("api/safe-media")]
+public class SafeNovitaMediaModelController: Controller
 {
     private INovitaModelRepository _repository;
-    public NovitaMediaModelController(INovitaModelRepository repository)
+    public SafeNovitaMediaModelController(INovitaModelRepository repository)
     {
         _repository = repository;
     }
@@ -16,28 +17,28 @@ public class NovitaMediaModelController: Controller
     [HttpGet("vae")]
     public async Task<List<NovitaModel>> GetVaeModels()
     {
-        return await _repository.GetVaeModels();
+        return await _repository.GetSafeVaeModels();
     }
     [HttpGet("lora")]
     public async Task<List<NovitaModel>> GetLoraModels()
     {
-        return await _repository.GetLoraModels();
+        return await _repository.GetSafeLoraModels();
     }
     [HttpGet("embedding")]
     public async Task<List<NovitaModel>> GetEmbeddingModels()
     {
-        return await _repository.GetEmbeddingModels();
+        return await _repository.GetSafeEmbeddingModels();
     }
     [HttpGet("image")]
     public async Task<List<NovitaModel>> GetImageModels()
     {
-        return await _repository.GetImageModels();
+        return await _repository.GetSafeImageModels();
     }
 
     [HttpGet("video")]
     public async Task<List<NovitaModel>> GetVideoModels()
     {
-        return await _repository.GetVideoModels();
+        return await _repository.GetSafeVideoModels();
     }
     
 }

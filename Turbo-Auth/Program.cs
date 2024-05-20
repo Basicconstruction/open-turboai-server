@@ -8,7 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Turbo_Auth.Context;
 using Turbo_Auth.Controllers.Extractors;
-using Turbo_Auth.Controllers.Sync;
+using Turbo_Auth.Controllers.MessageSync;
 using Turbo_Auth.Handlers.Builder;
 using Turbo_Auth.Handlers.Chat;
 using Turbo_Auth.Handlers.keyPool;

@@ -10,6 +10,12 @@ public class Model
         get;
         set;
     }
+
+    public bool Enable
+    {
+        get;
+        set;
+    }
     [Required]
     [MaxLength(30)]
     public string? Name

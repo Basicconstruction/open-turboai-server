@@ -20,7 +20,7 @@ public class ModelRepository: IModelRepository
 
     public async Task<List<Model>?> GetModelsOfKeyAsync(int keyId)
     {
-        return await _keyContext.ModelFees!.Where(f => f.SupplierKeyId == keyId)
+        return await _keyContext.ModelKeyBinds!.Where(f => f.SupplierKeyId == keyId)
             .Include(f => f.Model)
             .Select(f => f.Model!)
             .ToListAsync();
@@ -28,12 +28,12 @@ public class ModelRepository: IModelRepository
 
     public async Task DeleteModelByIdAsync(int id)
     {
-        var modelFees = await _keyContext.ModelFees!
+        var modelKeyBinds = await _keyContext.ModelKeyBinds!
             .Where(f => f.ModelId == id)
             .ToListAsync();
-        if (modelFees.Count != 0)
+        if (modelKeyBinds.Count != 0)
         {
-            _keyContext.ModelFees!.RemoveRange(modelFees);
+            _keyContext.ModelKeyBinds!.RemoveRange(modelKeyBinds);
             await _keyContext.SaveChangesAsync();
         }
         var model = await _keyContext.Models!.Where(m => m.ModelId == id).FirstOrDefaultAsync();
@@ -73,5 +73,18 @@ public class ModelRepository: IModelRepository
     public async Task<Model?> GetModelByName(string name)
     {
         return await _keyContext.Models!.FirstOrDefaultAsync(m => m.Name == name);
+    }
+
+    public async Task SetEnableStatus(int id, bool enable)
+    {
+        var modelKeyBinds = await _keyContext.ModelKeyBinds!.Where(mkb => mkb.ModelId == id)
+            .ToListAsync();
+        foreach (var mkb in modelKeyBinds)
+        {
+            mkb.Enable = enable;
+            Console.WriteLine(enable);
+        }
+
+        await _keyContext.SaveChangesAsync();
     }
 }

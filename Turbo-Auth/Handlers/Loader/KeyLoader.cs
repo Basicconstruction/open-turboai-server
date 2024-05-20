@@ -16,7 +16,8 @@ public class KeyLoader: IKeyLoader
     public async Task LoadKeys()
     {
         var keys = await _keyContext.SupplierKeys!
-            .Include(k => k.ModelFees)!
+            .Where(k=>k.Enable == true)
+            .Include(k => k.ModelKeyBinds)!
             .ThenInclude(k => k.Model)
             .ToListAsync();
         await _keyPoolRepository.Replace(keys);

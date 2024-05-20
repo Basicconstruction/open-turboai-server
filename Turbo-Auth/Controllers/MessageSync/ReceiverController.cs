@@ -4,7 +4,7 @@ using Turbo_Auth.Models.ClientSyncs.Messages;
 using Turbo_Auth.Models.Mediators.Messages;
 using Turbo_Auth.Repositories.Messages;
 
-namespace Turbo_Auth.Controllers.Sync;
+namespace Turbo_Auth.Controllers.MessageSync;
 
 [ApiController]
 [Authorize(Policy = "user")]

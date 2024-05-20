@@ -2,10 +2,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Turbo_Auth.Handlers.Loader;
 
-namespace Turbo_Auth.Controllers.Force;
+namespace Turbo_Auth.Controllers.KeyLoad;
 
 [ApiController]
-// [Authorize(Policy = "admin")]
+[Authorize(Policy = "admin")]
 [Route("api/sync")]
 public class SyncController: Controller
 {
