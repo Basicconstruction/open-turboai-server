@@ -6,5 +6,6 @@ public enum HandlerType
     Google,
     Anthropic,
     Novita,
+    Alibaba,
     Twitter
 }

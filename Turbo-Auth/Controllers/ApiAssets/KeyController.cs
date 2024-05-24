@@ -95,8 +95,13 @@ public class KeyController: Controller
             },
             new ()
             {
-                Type = "Twitter",
+                Type = "Alibaba",
                 RequestIdentifier = 4
+            },
+            new ()
+            {
+                Type = "Twitter",
+                RequestIdentifier = 5
             }
         };
         return Ok(types);

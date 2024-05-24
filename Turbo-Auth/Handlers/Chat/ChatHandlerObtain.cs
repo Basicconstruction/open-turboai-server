@@ -14,6 +14,7 @@ public class ChatHandlerObtain: IChatHandlerObtain
             HandlerType.Google => new GoogleChatHandler(),
             HandlerType.Openai => new OpenAiChatHandler(),
             HandlerType.Anthropic => new AnthropicChatHandler(),
+            HandlerType.Alibaba => new AlibabaChatHandler(),
             HandlerType.Twitter => new TwitterChatHandler(),
             _ => new OpenAiChatHandler()
         };
