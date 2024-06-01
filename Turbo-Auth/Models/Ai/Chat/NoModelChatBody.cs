@@ -26,6 +26,13 @@ public class NoModelChatBody
 
     [JsonProperty("top_p")] 
     public double? TopP {get;set;}
+
+    [JsonProperty("vision")]
+    public bool Vision
+    {
+        get;
+        set;
+    }
     public override string ToString()
     {
         var sb = new StringBuilder();
@@ -44,10 +51,48 @@ public class Message
     public string? Role { get; set; }
 
     [JsonProperty("content")]
-    public string? Content { get; set; }
+    public dynamic? Content { get; set; }
 
     public override string ToString()
     {
         return $"Message: Role={Role}, Content={Content}";
+    }
+}
+
+public class VisionContent
+{
+    [JsonProperty("type")]
+    public string? Type
+    {
+        get;
+        set;
+    }
+    [JsonProperty("text")]
+    public string? Text
+    {
+        get;
+        set;
+    }
+    [JsonProperty("image_url")]
+    public VisionImage? VisionImage
+    {
+        get;
+        set;
+    }
+}
+
+public class VisionImage
+{
+    [JsonProperty("url")]
+    public string? Url
+    {
+        get;
+        set;
+    }
+    [JsonProperty("detail")]
+    public string? Detail
+    {
+        get;
+        set;
     }
 }

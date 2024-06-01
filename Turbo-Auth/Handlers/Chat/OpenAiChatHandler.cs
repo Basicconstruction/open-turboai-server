@@ -19,12 +19,11 @@ public class OpenAiChatHandler : IChatHandler
         });
         var completionResult = openAiService.ChatCompletion.CreateCompletionAsStream(new ChatCompletionCreateRequest
         {
-            Messages = TransferObject(chatBody.Messages!),
+            Messages = TransferObject(chatBody.Messages!,chatBody.Vision),
             Model = modelKey.Model,
             MaxTokens = chatBody.MaxTokens,
             TopP = (float?)chatBody.TopP,
             PresencePenalty = (float?)chatBody.PresencePenalty,
-            
         });
 
         await foreach (var completion in completionResult)
@@ -57,7 +56,7 @@ public class OpenAiChatHandler : IChatHandler
         await response.CompleteAsync();
     }
 
-    private static List<ChatMessage> TransferObject(IEnumerable<Message> messages)
+    private static List<ChatMessage> TransferObject(IEnumerable<Message> messages,bool vision=false)
     {
         var ms = new List<ChatMessage>();
         foreach (var message in messages)
@@ -68,7 +67,29 @@ public class OpenAiChatHandler : IChatHandler
                     ms.Add(ChatMessage.FromSystem(message.Content!));
                     break;
                 case OpenAiRole.UserRole:
-                    ms.Add(ChatMessage.FromUser(message.Content!));
+                    if (vision)
+                    {
+                        var mcl = new List<MessageContent>();
+                        foreach (var vc in (message.Content as VisionContent[])!)
+                        {
+                            mcl.Add(new MessageContent()
+                            {
+                                Type = vc.Type!,
+                                Text = vc.Text,
+                                ImageUrl = new VisionImageUrl()
+                                {
+                                    Url = vc.VisionImage!.Url!,
+                                    Detail = vc.VisionImage!.Detail
+                                }
+                            });
+                        }
+                        ms.Add(ChatMessage.FromUser(mcl));
+                    }
+                    else
+                    {
+                        ms.Add(ChatMessage.FromUser(message.Content!));
+                    }
+                    
                     break;
                 case OpenAiRole.Assistant:
                     ms.Add(ChatMessage.FromAssistant(message.Content!));
