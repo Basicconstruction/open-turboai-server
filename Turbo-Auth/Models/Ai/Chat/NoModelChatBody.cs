@@ -45,6 +45,20 @@ public class NoModelChatBody
     }
 }
 
+public class VisionMessage
+{
+    [JsonProperty("role")]
+    public string? Role { get; set; }
+
+    [JsonProperty("content")]
+    public List<VisionContent>? Content { get; set; }
+
+    public override string ToString()
+    {
+        return $"Message: Role={Role}, Content={Content}";
+    }
+}
+
 public class Message
 {
     [JsonProperty("role")]
@@ -79,6 +93,11 @@ public class VisionContent
         get;
         set;
     }
+
+    public override string ToString()
+    {
+        return $"type {Type} text {Text} img {VisionImage}";
+    }
 }
 
 public class VisionImage
@@ -94,5 +113,10 @@ public class VisionImage
     {
         get;
         set;
+    }
+
+    public override string ToString()
+    {
+        return $"url: {Url} detail: {Detail}";
     }
 }

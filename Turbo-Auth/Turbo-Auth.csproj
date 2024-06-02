@@ -32,6 +32,7 @@
     <ItemGroup>
       <Folder Include="Entities\" />
       <Folder Include="Models\Ai\Image\Response\Normal\Extra\" />
+      <Folder Include="Resources\uploads\" />
       <Folder Include="wwwroot\" />
     </ItemGroup>
 

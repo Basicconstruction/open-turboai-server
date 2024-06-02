@@ -1,8 +1,8 @@
-﻿using OpenAI;
+﻿using Newtonsoft.Json;
+using OpenAI;
 using OpenAI.Managers;
 using OpenAI.ObjectModels.RequestModels;
 using Turbo_Auth.Handlers.Model2Key;
-using Turbo_Auth.Models.Ai;
 using Turbo_Auth.Models.Ai.Chat;
 
 namespace Turbo_Auth.Handlers.Chat;
@@ -17,15 +17,15 @@ public class OpenAiChatHandler : IChatHandler
             ApiKey = modelKey.SupplierKey!.ApiKey!,
             BaseDomain = modelKey.SupplierKey.BaseUrl!
         });
+        var messages = TransferObject(chatBody.Messages!, chatBody.Vision);
         var completionResult = openAiService.ChatCompletion.CreateCompletionAsStream(new ChatCompletionCreateRequest
         {
-            Messages = TransferObject(chatBody.Messages!,chatBody.Vision),
+            Messages = messages,
             Model = modelKey.Model,
             MaxTokens = chatBody.MaxTokens,
             TopP = (float?)chatBody.TopP,
             PresencePenalty = (float?)chatBody.PresencePenalty,
         });
-
         await foreach (var completion in completionResult)
         {
             if (completion.Successful)
@@ -58,44 +58,57 @@ public class OpenAiChatHandler : IChatHandler
 
     private static List<ChatMessage> TransferObject(IEnumerable<Message> messages,bool vision=false)
     {
+        
         var ms = new List<ChatMessage>();
         foreach (var message in messages)
         {
             switch (message.Role!.ToLower()!)
             {
                 case OpenAiRole.SystemRole:
-                    ms.Add(ChatMessage.FromSystem(message.Content!));
+                    ms.Add(ChatMessage.FromSystem(message.Content! as string));
                     break;
                 case OpenAiRole.UserRole:
                     if (vision)
                     {
                         var mcl = new List<MessageContent>();
-                        foreach (var vc in (message.Content as VisionContent[])!)
+                        foreach (var vc in JsonConvert.DeserializeObject<VisionMessage>(JsonConvert.SerializeObject(message))!.Content)
                         {
-                            mcl.Add(new MessageContent()
+                            if (vc.Type == "text")
                             {
-                                Type = vc.Type!,
-                                Text = vc.Text,
-                                ImageUrl = new VisionImageUrl()
+                                mcl.Add(new MessageContent()
                                 {
-                                    Url = vc.VisionImage!.Url!,
-                                    Detail = vc.VisionImage!.Detail
-                                }
-                            });
+                                    Type = vc.Type!,
+                                    Text = vc.Text,
+                                });
+                            }
+                            else
+                            {
+                                mcl.Add(new MessageContent()
+                                {
+                                    Type = vc.Type!,
+                                    ImageUrl = new VisionImageUrl()
+                                    {
+                                        Url = vc.VisionImage!.Url!,
+                                        Detail = vc.VisionImage!.Detail
+                                    }
+                                });
+                            }
+
+                            
                         }
                         ms.Add(ChatMessage.FromUser(mcl));
                     }
                     else
                     {
-                        ms.Add(ChatMessage.FromUser(message.Content!));
+                        ms.Add(ChatMessage.FromUser(message.Content! as string));
                     }
                     
                     break;
                 case OpenAiRole.Assistant:
-                    ms.Add(ChatMessage.FromAssistant(message.Content!));
+                    ms.Add(ChatMessage.FromAssistant(message.Content! as string));
                     break;
                 default:
-                    ms.Add(ChatMessage.FromUser(message.Content!));
+                    ms.Add(ChatMessage.FromUser(message.Content! as string));
                     break;
             }
         }
