@@ -1,95 +1,144 @@
-﻿using DotnetGeminiSDK.Client;
+﻿using System.Diagnostics;
+using DotnetGeminiSDK.Client;
 using DotnetGeminiSDK.Config;
+using DotnetGeminiSDK.Model;
+using DotnetGeminiSDK.Model.Request;
 using DotnetGeminiSDK.Requester;
 using Newtonsoft.Json;
 using Turbo_Auth.Handlers.Model2Key;
-using Turbo_Auth.Models.Ai;
 using Turbo_Auth.Models.Ai.Chat;
 using Part = DotnetGeminiSDK.Model.Request.Part;
 
 namespace Turbo_Auth.Handlers.Chat;
+
 [Obsolete]
-public class GoogleChatHandler: IChatHandler
+public class GoogleChatHandler : IChatHandler
 {
-    public async Task Chat(NoModelChatBody chatBody, ModelKey modelKey,HttpResponse response)
+    public async Task Chat(NoModelChatBody chatBody, ModelKey modelKey, HttpResponse response)
     {
-        var messages = TransferObject(chatBody.Messages);
+        var messages = TransferObject(chatBody.Messages, chatBody.Vision);
         var geminiClient = new GeminiClient(
             new GoogleGeminiConfig()
             {
                 ApiKey = modelKey.SupplierKey!.ApiKey!
             },
             new ApiRequester()
-            );
-        await geminiClient.StreamTextPrompt(messages, async (chunck) =>
+        );
+        if (chatBody.Vision)
         {
-            chunck = FillBlock(chunck);
-            var geminiParts = JsonConvert.DeserializeObject<GeminiPart[]>(chunck);
-            if (geminiParts == null) return;
-            foreach (var block in geminiParts)
+            var message = chatBody.Messages.Last();
+            var vc = JsonConvert.DeserializeObject<VisionMessage>(JsonConvert.SerializeObject(message))!.Content;
+            var text = "";
+            var base64Image = "";
+            var type = "";
+            foreach (var v in vc)
             {
-                // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
-                if (block != null)
+                if (v.Type == "text")
                 {
-                    await response.WriteAsync(block!.Candidates![0]!.Content.Parts[0].Text);
+                    text = v.Text;
+                }
+                else
+                {
+                    var inlineData = GetInlineData(v.VisionImage.Url);
+                    base64Image = inlineData.Data;
+                    type = inlineData.MimeType;
                 }
             }
-        });
+
+            var mimeType = type switch
+            {
+                "image/jpeg" => ImageMimeType.Jpeg,
+                "image/jpg" => ImageMimeType.Jpg,
+                "image/png" => ImageMimeType.Png,
+                "image/webp" => ImageMimeType.Webp,
+                "image/heic" => ImageMimeType.Heic,
+                "image/heif" => ImageMimeType.Heif,
+                _ => ImageMimeType.Jpeg
+            };
+
+            var res = await geminiClient.ImagePrompt(text, base64Image,mimeType);
+            // foreach (var ms in res.Candidates)
+            // {
+            //     foreach (var part in ms.Content.Parts)
+            //     {
+            //         Console.WriteLine(part);
+            //     }
+            // }
+        }
+        else
+        {
+            await geminiClient.StreamTextPrompt(messages, async (chunck) =>
+            {
+                chunck = FillBlock(chunck);
+                var geminiParts = JsonConvert.DeserializeObject<GeminiPart[]>(chunck);
+                if (geminiParts == null) return;
+                foreach (var block in geminiParts)
+                {
+                    // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+                    if (block != null)
+                    {
+                        await response.WriteAsync(block!.Candidates![0]!.Content.Parts[0].Text);
+                    }
+                }
+            });
+        }
     }
 
-    private List<DotnetGeminiSDK.Model.Request.Content> TransferObject(Message[]? chatBodyMessages)
+    private static List<Content> TransferObject(Message[]? chatBodyMessages, bool vision = false)
     {
-        var parts = new List<DotnetGeminiSDK.Model.Request.Content>();
+        var parts = new List<Content>();
+
         foreach (var message in chatBodyMessages!)
         {
             switch (message.Role!.ToLower())
             {
                 case OpenAiRole.SystemRole:
-                    parts.Add(new ()
+                    parts.Add(new()
                     {
                         Role = GoogleRoles.User,
                         Parts = new List<Part>()
                         {
-                            new ()
+                            new()
                             {
-                                Text = message!.Content!,
+                                Text = message!.Content! as string,
                             }
                         }
                     });
                     break;
                 case OpenAiRole.UserRole:
-                    parts.Add(new ()
+                    parts.Add(new()
                     {
                         Role = GoogleRoles.User,
                         Parts = new List<Part>()
                         {
-                            new ()
+                            new()
                             {
-                                Text = message!.Content!
+                                Text = message!.Content! as string
                             }
                         }
                     });
+
                     break;
                 case OpenAiRole.Assistant:
-                    parts.Add(new ()
+                    parts.Add(new()
                     {
                         Role = GoogleRoles.Model,
                         Parts = new List<Part>()
                         {
-                            new ()
+                            new()
                             {
-                                Text = message!.Content!
+                                Text = message!.Content! as string
                             }
-                        } 
+                        }
                     });
                     break;
                 default:
-                    parts.Add(new ()
+                    parts.Add(new()
                     {
                         Role = GoogleRoles.User,
                         Parts = new List<Part>()
                         {
-                            new ()
+                            new()
                             {
                                 Text = message!.Content!,
                             }
@@ -99,7 +148,20 @@ public class GoogleChatHandler: IChatHandler
             }
         }
 
+
         return parts;
+    }
+
+    private static InlineData? GetInlineData(string url)
+    {
+        var parts = url.Split(',');
+        var mimeType = parts[0].Split(':')[1].Split(';')[0];
+        var data = parts[1];
+        return new InlineData()
+        {
+            Data = data,
+            MimeType = mimeType
+        };
     }
 
     private string FillBlock(string chunck)

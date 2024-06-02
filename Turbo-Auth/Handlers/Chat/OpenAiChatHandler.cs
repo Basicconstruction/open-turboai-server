@@ -86,10 +86,10 @@ public class OpenAiChatHandler : IChatHandler
                                 mcl.Add(new MessageContent()
                                 {
                                     Type = vc.Type!,
-                                    ImageUrl = new VisionImageUrl()
+                                    ImageUrl = new MessageImageUrl()
                                     {
                                         Url = vc.VisionImage!.Url!,
-                                        Detail = vc.VisionImage!.Detail
+                                        Detail = vc.VisionImage.Detail!
                                     }
                                 });
                             }

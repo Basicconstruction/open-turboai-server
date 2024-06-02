@@ -8,10 +8,10 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Anthropic.SDK" Version="2.0.1" />
-        <PackageReference Include="Betalgo.OpenAI" Version="7.4.6" />
+        <PackageReference Include="Anthropic.SDK" Version="3.2.1" />
+        <PackageReference Include="Betalgo.OpenAI" Version="8.2.2" />
         <PackageReference Include="DashScope" Version="0.9.4" />
-        <PackageReference Include="DotnetGeminiSDK" Version="1.0.12" />
+        <PackageReference Include="DotnetGeminiSDK" Version="1.0.14" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.0" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
