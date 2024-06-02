@@ -24,127 +24,115 @@ public class GoogleChatHandler : IChatHandler
             },
             new ApiRequester()
         );
-        if (chatBody.Vision)
+        await geminiClient.StreamTextPrompt(messages, async (chunck) =>
         {
-            var message = chatBody.Messages.Last();
-            var vc = JsonConvert.DeserializeObject<VisionMessage>(JsonConvert.SerializeObject(message))!.Content;
-            var text = "";
-            var base64Image = "";
-            var type = "";
-            foreach (var v in vc)
+            Console.WriteLine(chunck);
+            chunck = FillBlock(chunck);
+            var geminiParts = JsonConvert.DeserializeObject<GeminiPart[]>(chunck);
+            if (geminiParts == null) return;
+            foreach (var block in geminiParts)
             {
-                if (v.Type == "text")
+                // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+                if (block != null)
                 {
-                    text = v.Text;
-                }
-                else
-                {
-                    var inlineData = GetInlineData(v.VisionImage.Url);
-                    base64Image = inlineData.Data;
-                    type = inlineData.MimeType;
+                    await response.WriteAsync(block!.Candidates![0]!.Content.Parts[0].Text);
                 }
             }
-
-            var mimeType = type switch
-            {
-                "image/jpeg" => ImageMimeType.Jpeg,
-                "image/jpg" => ImageMimeType.Jpg,
-                "image/png" => ImageMimeType.Png,
-                "image/webp" => ImageMimeType.Webp,
-                "image/heic" => ImageMimeType.Heic,
-                "image/heif" => ImageMimeType.Heif,
-                _ => ImageMimeType.Jpeg
-            };
-
-            var res = await geminiClient.ImagePrompt(text, base64Image,mimeType);
-            // foreach (var ms in res.Candidates)
-            // {
-            //     foreach (var part in ms.Content.Parts)
-            //     {
-            //         Console.WriteLine(part);
-            //     }
-            // }
-        }
-        else
-        {
-            await geminiClient.StreamTextPrompt(messages, async (chunck) =>
-            {
-                chunck = FillBlock(chunck);
-                var geminiParts = JsonConvert.DeserializeObject<GeminiPart[]>(chunck);
-                if (geminiParts == null) return;
-                foreach (var block in geminiParts)
-                {
-                    // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
-                    if (block != null)
-                    {
-                        await response.WriteAsync(block!.Candidates![0]!.Content.Parts[0].Text);
-                    }
-                }
-            });
-        }
+        });
     }
 
     private static List<Content> TransferObject(Message[]? chatBodyMessages, bool vision = false)
     {
         var parts = new List<Content>();
 
-        foreach (var message in chatBodyMessages!)
+        if (!vision)
         {
-            switch (message.Role!.ToLower())
+            foreach (var message in chatBodyMessages!)
             {
-                case OpenAiRole.SystemRole:
-                    parts.Add(new()
-                    {
-                        Role = GoogleRoles.User,
-                        Parts = new List<Part>()
+                switch (message.Role!.ToLower())
+                {
+                    case OpenAiRole.SystemRole:
+                        parts.Add(new()
                         {
-                            new()
+                            Role = GoogleRoles.User,
+                            Parts = new List<Part>()
                             {
-                                Text = message!.Content! as string,
+                                new()
+                                {
+                                    Text = message!.Content! as string,
+                                }
                             }
-                        }
-                    });
-                    break;
-                case OpenAiRole.UserRole:
-                    parts.Add(new()
-                    {
-                        Role = GoogleRoles.User,
-                        Parts = new List<Part>()
+                        });
+                        break;
+                    case OpenAiRole.UserRole:
+                        parts.Add(new()
                         {
-                            new()
+                            Role = GoogleRoles.User,
+                            Parts = new List<Part>()
                             {
-                                Text = message!.Content! as string
+                                new()
+                                {
+                                    Text = message!.Content! as string
+                                }
                             }
-                        }
-                    });
+                        });
 
-                    break;
-                case OpenAiRole.Assistant:
-                    parts.Add(new()
-                    {
-                        Role = GoogleRoles.Model,
-                        Parts = new List<Part>()
+                        break;
+                    case OpenAiRole.Assistant:
+                        parts.Add(new()
                         {
-                            new()
+                            Role = GoogleRoles.Model,
+                            Parts = new List<Part>()
                             {
-                                Text = message!.Content! as string
+                                new()
+                                {
+                                    Text = message!.Content! as string
+                                }
                             }
-                        }
-                    });
-                    break;
-                default:
-                    parts.Add(new()
-                    {
-                        Role = GoogleRoles.User,
-                        Parts = new List<Part>()
+                        });
+                        break;
+                    default:
+                        parts.Add(new()
                         {
-                            new()
+                            Role = GoogleRoles.User,
+                            Parts = new List<Part>()
                             {
-                                Text = message!.Content!,
+                                new()
+                                {
+                                    Text = message!.Content!,
+                                }
                             }
-                        }
+                        });
+                        break;
+                }
+            }
+        }
+        else
+        {
+            var message = chatBodyMessages.Last();
+            var content = new Content();
+            content.Role = GoogleRoles.User;
+            parts.Add(content);
+            var contentParts = new List<Part>();
+            content.Parts = contentParts;
+            foreach (var vc in JsonConvert.DeserializeObject<VisionMessage>(JsonConvert.SerializeObject(message))!
+                         .Content)
+            {
+                if (vc.Type == "text")
+                {
+                    contentParts.Add(new Part()
+                    {
+                        Text = vc.Text
                     });
-                    break;
+                }
+                else
+                {
+                    var inlineData = GetInlineData(vc.VisionImage.Url);
+                    contentParts.Add(new Part()
+                    {
+                        InlineData = inlineData
+                    });
+                }
             }
         }
 
