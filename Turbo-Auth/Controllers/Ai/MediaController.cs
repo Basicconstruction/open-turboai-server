@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Net.Mime;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using OpenAI;
 using OpenAI.Managers;
 using OpenAI.ObjectModels.RequestModels;
 using Turbo_Auth.Handlers.Model2Key;
+using Turbo_Auth.Models.Ai.Image.Request;
+using Turbo_Auth.Models.Ai.Media.STT;
 
 namespace Turbo_Auth.Controllers.Ai;
 
@@ -41,34 +44,63 @@ public class MediaController : Controller
     }
 
     [HttpPost("whisper-translate")]
-    public async Task<IActionResult> WhisperTranslate(AudioCreateTranscriptionRequest transcriptionRequest)
+    public async Task<IActionResult> WhisperTranslate(OpenAiTranslationRequest request)
     {
-        var modelKey = _quickModel.GetModelAndKey(transcriptionRequest.Model);
+        var modelKey = _quickModel.GetModelAndKey(request.Model!);
         var openaiService = new OpenAIService(new OpenAiOptions()
         {
             ApiKey = modelKey!.SupplierKey!.ApiKey!,
             BaseDomain = modelKey.SupplierKey.BaseUrl!
         });
-        var translateResult = await openaiService.Audio.CreateTranslation(transcriptionRequest);
-        
-        return Ok();
+        var audioRequest = Transfer(request);
+        var translateResult = await openaiService.Audio.CreateTranslation(audioRequest);
+        return Ok(translateResult);
     }
     [HttpPost("whisper-transcription")]
-    public async Task<IActionResult> WhisperTranscription(AudioCreateTranscriptionRequest transcriptionRequest)
+    public async Task<IActionResult> WhisperTranscription(OpenAiTranscriptionRequest request)
     {
-        var modelKey = _quickModel.GetModelAndKey(transcriptionRequest.Model);
+        var modelKey = _quickModel.GetModelAndKey(request.Model!);
         var openaiService = new OpenAIService(new OpenAiOptions()
         {
             ApiKey = modelKey!.SupplierKey!.ApiKey!,
             BaseDomain = modelKey.SupplierKey.BaseUrl!
         });
-        var transcriptionResult = await openaiService.Audio.CreateTranscription(transcriptionRequest);
+        var audioRequest = Transfer(request);
+        var transcriptionResult = await openaiService.Audio.CreateTranscription(audioRequest);
+        return Ok(transcriptionResult);
+    }
+    private AudioCreateTranscriptionRequest Transfer(OpenAiTranslationRequest request)
+    {
         
-        return Ok();
+        var audioRequest = new AudioCreateTranscriptionRequest()
+        {
+            Model = request.Model!,
+            Prompt = request.Prompt,
+            Temperature = request.Temperature,
+            ResponseFormat = request.ResponseFormat,
+            FileName = DateTime.Now.ToLongTimeString()+request.Suffix,
+            File = Convert.FromBase64String(request.File!)
+        };
+        return audioRequest;
+    }
+    private AudioCreateTranscriptionRequest Transfer(OpenAiTranscriptionRequest request)
+    {
+        
+        var audioRequest = new AudioCreateTranscriptionRequest()
+        {
+            Model = request.Model!,
+            Prompt = request.Prompt,
+            Temperature = request.Temperature,
+            ResponseFormat = request.ResponseFormat,
+            Language = request.Language,
+            FileName = DateTime.Now.ToLongTimeString()+request.Suffix,
+            File = Convert.FromBase64String(request.File!)
+        };
+        return audioRequest;
     }
 
     [HttpPost("dall-e-3")]
-    public async Task<IActionResult> Dall_E_3(ImageCreateRequest imageCreate)
+    public async Task<IActionResult> Dall_E_3(DallE3Request imageCreate)
     {
         var modelKey = _quickModel.GetModelAndKey(imageCreate.Model!);
         var openaiService = new OpenAIService(new OpenAiOptions()
@@ -76,7 +108,18 @@ public class MediaController : Controller
             ApiKey = modelKey!.SupplierKey!.ApiKey!,
             BaseDomain = modelKey.SupplierKey.BaseUrl!
         });
-        var imageResult = await openaiService.Image.CreateImage(imageCreate);
-        return Ok();
+        var imageResult = await openaiService
+            .Image.CreateImage(new ImageCreateRequest()
+        {
+            Model = imageCreate.Model,
+            N = imageCreate.N,
+            Prompt = imageCreate.Prompt!,
+            Quality = imageCreate.Quality,
+            ResponseFormat = imageCreate.ResponseFormat,
+            Size = imageCreate.Size,
+            Style = imageCreate.Style
+        });
+        // Console.WriteLine(imageResult);
+        return Ok(imageResult);
     }
 }
