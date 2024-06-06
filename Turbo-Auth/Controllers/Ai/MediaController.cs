@@ -53,6 +53,7 @@ public class MediaController : Controller
             BaseDomain = modelKey.SupplierKey.BaseUrl!
         });
         var audioRequest = Transfer(request);
+        // Console.WriteLine(audioRequest);
         var translateResult = await openaiService.Audio.CreateTranslation(audioRequest);
         return Ok(translateResult);
     }
@@ -66,6 +67,7 @@ public class MediaController : Controller
             BaseDomain = modelKey.SupplierKey.BaseUrl!
         });
         var audioRequest = Transfer(request);
+        // Console.WriteLine(audioRequest);
         var transcriptionResult = await openaiService.Audio.CreateTranscription(audioRequest);
         return Ok(transcriptionResult);
     }
@@ -78,7 +80,7 @@ public class MediaController : Controller
             Prompt = request.Prompt,
             Temperature = request.Temperature,
             ResponseFormat = request.ResponseFormat,
-            FileName = DateTime.Now.ToLongTimeString()+request.Suffix,
+            FileName = DateTime.Now.ToLongTimeString()+"."+request.Suffix,
             File = Convert.FromBase64String(request.File!)
         };
         return audioRequest;
@@ -93,7 +95,7 @@ public class MediaController : Controller
             Temperature = request.Temperature,
             ResponseFormat = request.ResponseFormat,
             Language = request.Language,
-            FileName = DateTime.Now.ToLongTimeString()+request.Suffix,
+            FileName = DateTime.Now.ToLongTimeString()+"."+request.Suffix,
             File = Convert.FromBase64String(request.File!)
         };
         return audioRequest;

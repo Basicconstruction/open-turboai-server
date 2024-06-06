@@ -53,4 +53,10 @@ public class OpenAiTranscriptionRequest
         get;
         set;
     }
+
+    public override string ToString()
+    {
+        return $"OpenAiTranslationRequest{{model='{Model}', prompt='{Prompt}', temperature={Temperature}, responseFormat='{ResponseFormat}', suffix='{Suffix}', language='{Language}'}}";
+
+    }
 }
