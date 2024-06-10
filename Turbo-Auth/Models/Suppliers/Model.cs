@@ -17,7 +17,7 @@ public class Model
         set;
     }
     [Required]
-    [MaxLength(30)]
+    [MaxLength(200)]
     public string? Name
     {
         get;

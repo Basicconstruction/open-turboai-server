@@ -3,7 +3,7 @@ create table Models
     ModelId int auto_increment
         primary key,
     Enable  tinyint(1)  not null,
-    Name    varchar(30) not null
+    Name    varchar(200) not null
 );
 create table SupplierKeys
 (

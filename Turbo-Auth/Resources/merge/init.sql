@@ -53,7 +53,7 @@ create table Models
 (
     ModelId int auto_increment
         primary key,
-    Name    varchar(30) not null
+    Name    varchar(200) not null
 );
 
 create table SupplierKeys
