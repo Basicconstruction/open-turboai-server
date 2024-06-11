@@ -18,6 +18,11 @@ public class ModelRepository: IModelRepository
         return await _keyContext.Models!.ToListAsync();
     }
 
+    public async Task<List<Model>?> GetChatModelsAsync()
+    {
+        return await _keyContext.Models!.Where(m => m.IsChatModel == true).ToListAsync();
+    } 
+
     public async Task<List<Model>?> GetModelsOfKeyAsync(int keyId)
     {
         return await _keyContext.ModelKeyBinds!.Where(f => f.SupplierKeyId == keyId)
@@ -45,14 +50,18 @@ public class ModelRepository: IModelRepository
         await _keyContext.SaveChangesAsync();
     }
 
-    public async Task AddModelAsync(string name)
+    public async Task AddModelAsync(Model model)
     {
-        var exists = await _keyContext.Models!.AnyAsync(m => m.Name == name);
+        var exists = await _keyContext.Models!.AnyAsync(m => m.Name == model.Name&&m.ModelValue==model.ModelValue);
         if (!exists)
         {
             _keyContext.Models!.Add(new Model()
             {
-                Name = name
+                Name = model.Name,
+                Enable = model.Enable,
+                IsChatModel = model.IsChatModel,
+                Vision = model.Vision,
+                ModelValue = model.ModelValue
             });
             await _keyContext.SaveChangesAsync();
         }
@@ -65,9 +74,12 @@ public class ModelRepository: IModelRepository
         if (innerModel != null)
         {
             innerModel.Name = model.Name;
+            innerModel.IsChatModel = model.IsChatModel;
+            innerModel.Enable = model.Enable;
+            innerModel.ModelValue = model.ModelValue;
+            innerModel.Vision = model.Vision;
             await _keyContext.SaveChangesAsync();
         }
-        
     }
 
     public async Task<Model?> GetModelByName(string name)

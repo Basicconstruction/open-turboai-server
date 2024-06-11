@@ -2,10 +2,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Turbo_Auth.Handlers.Chat;
 using Turbo_Auth.Handlers.Differentiator;
-using Turbo_Auth.Handlers.Group;
 using Turbo_Auth.Handlers.Model;
 using Turbo_Auth.Handlers.Model2Key;
 using Turbo_Auth.Models.Ai.Chat;
+using Turbo_Auth.Repositories.ApiAssets;
 
 namespace Turbo_Auth.Controllers.Ai;
 [Authorize(Policy = "vip")]
@@ -16,13 +16,16 @@ public class ChatController: Controller
     private IChatHandlerObtain _chatHandlerObtain;
     private QuickModel _quickModel;
     private PlayMixModelBacker _backer;
+    private IModelRepository _modelRepository;
     public ChatController(IChatHandlerObtain chatHandlerObtain, 
-        QuickModel quickModel,PlayMixModelBacker backer
+        QuickModel quickModel,PlayMixModelBacker backer,
+        IModelRepository modelRepository
     )
     {
         _chatHandlerObtain = chatHandlerObtain;
         _quickModel = quickModel;
         _backer = backer;
+        _modelRepository = modelRepository;
     }
     
     
@@ -45,10 +48,15 @@ public class ChatController: Controller
     }
 
     [HttpGet("models")]
-    // [Authorize("user")]
-    public List<ChatDisplayModel> GetChatModels()
+    [Authorize("user")]
+    public async Task<List<ChatDisplayModel>> GetChatModels()
     {
-        var group = new ModelGroup(true);
-        return group.Group[0];
+        var models = await _modelRepository.GetChatModelsAsync();
+        return models!.Select(m=>new ChatDisplayModel()
+        {
+            ModelName = m.Name,
+            ModelValue = m.ModelValue,
+            Vision = m.Vision
+        }).ToList();
     }
 }

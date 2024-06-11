@@ -2,6 +2,10 @@
 
 public class ChatDisplayModel
 {
+    public ChatDisplayModel()
+    {
+        
+    }
     public ChatDisplayModel(string modelName, string modelValue)
     {
         ModelName = modelName;
@@ -20,6 +24,12 @@ public class ChatDisplayModel
     }
 
     public string? ModelValue
+    {
+        get;
+        set;
+    }
+
+    public bool Vision
     {
         get;
         set;

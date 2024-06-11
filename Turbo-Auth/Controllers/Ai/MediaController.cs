@@ -12,7 +12,7 @@ using Turbo_Auth.Models.Ai.Media.STT;
 namespace Turbo_Auth.Controllers.Ai;
 
 [ApiController]
-// [Authorize("vip")]
+[Authorize("vip")]
 [Route("api/[controller]")]
 public class MediaController : Controller
 {

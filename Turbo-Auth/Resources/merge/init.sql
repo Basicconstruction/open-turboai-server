@@ -51,9 +51,13 @@ create index IX_AccountRoles_RoleId
 # key
 create table Models
 (
-    ModelId int auto_increment
+    ModelId     int auto_increment
         primary key,
-    Name    varchar(200) not null
+    Enable      tinyint(1)           not null,
+    Name        varchar(200)         not null,
+    IsChatModel tinyint(1)           not null comment '是否是对话模型',
+    ModelValue  varchar(200)         not null,
+    Vision      tinyint(1) default 0 not null
 );
 
 create table SupplierKeys

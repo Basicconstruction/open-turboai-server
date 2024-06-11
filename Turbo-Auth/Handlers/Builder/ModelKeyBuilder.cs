@@ -30,7 +30,7 @@ public class ModelKeyBuilder: IModelKeyBuilder
             foreach (var item in group)
             {
                 var exist = supplierKeys.Any(s =>
-                    s.ModelKeyBinds != null && s.ModelKeyBinds.Any(m => m.Model!.Name==item.ModelValue));
+                    s.ModelKeyBinds != null && s.ModelKeyBinds.Any(m => m.Model!.ModelValue==item.ModelValue));
                 if (exist)
                 {
                     fg.Add(new ChatDisplayModel(item.ModelName!,item.ModelValue!));
@@ -51,7 +51,7 @@ public class ModelKeyBuilder: IModelKeyBuilder
         {
             if (key.ModelKeyBinds != null)
             {
-                foreach (var model in key.ModelKeyBinds!.Select(m => m.Model!.Name))
+                foreach (var model in key.ModelKeyBinds!.Select(m => m.Model!.ModelValue))
                 {
                     models.Add(model!);
                 }
@@ -62,7 +62,7 @@ public class ModelKeyBuilder: IModelKeyBuilder
         foreach (var model in models)
         {
             var weightKeys = supplierKeys.SelectMany(key => key.ModelKeyBinds!)
-                .Where(modelKeyBind => (modelKeyBind.Model!.Name == model&&modelKeyBind.Enable))
+                .Where(modelKeyBind => (modelKeyBind.Model!.ModelValue == model&&modelKeyBind.Enable))
                 .Select(modelKeyBind => new WeightKey
                 {
                     Weight = 1 / modelKeyBind.Fee,

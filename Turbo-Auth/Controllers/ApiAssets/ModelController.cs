@@ -69,7 +69,7 @@ public class ModelController: Controller
     {
         try
         {
-            await _modelRepository.AddModelAsync(model.Name!);
+            await _modelRepository.AddModelAsync(model);
             return Ok();
         }
         catch (Exception e)
