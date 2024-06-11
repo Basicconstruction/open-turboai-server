@@ -36,4 +36,26 @@ public class Tests
         var path = "C:\\Users\\betha\\Desktop\\sandbox.txt";
         Console.WriteLine((new TextDocumentProcessor()).Process(path));
     }
+
+    [Test]
+    public void Test4()
+    {
+        string url = "https://api.chatanywhere.com.cn:10111/sdfs/fsdfsd";
+        // url = "https://api.chatanywhere.com.cn";
+        Uri uri = new Uri(url);
+        string path = uri.AbsolutePath;
+        Console.WriteLine(uri.GetLeftPart(UriPartial.Authority));
+        Console.WriteLine(path); // Output: /sdfs/fsdfsd
+        string subRoute = path.TrimStart('/');
+
+        Console.WriteLine(subRoute); // Output: sdfs/fsdfsd
+        
+        string[] segments = uri.Segments;
+
+        string subRoute2 = string.Join("/", segments.Skip(1));
+
+        Console.WriteLine(subRoute2); // Output: sdfs/fsdfsd
+
+
+    }
 }

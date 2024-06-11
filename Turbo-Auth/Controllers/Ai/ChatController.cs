@@ -25,7 +25,7 @@ public class ChatController: Controller
         _chatHandlerObtain = chatHandlerObtain;
         _quickModel = quickModel;
         _backer = backer;
-        _modelRepository = modelRepository;
+        _modelRepository = modelRepository; 
     }
     
     

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using OpenAI;
 using OpenAI.Managers;
 using OpenAI.ObjectModels.RequestModels;
@@ -12,11 +13,24 @@ public class OpenAiChatHandler : IChatHandler
     
     public async Task Chat(NoModelChatBody chatBody, ModelKey modelKey,HttpResponse response)
     {
-        var openAiService = new OpenAIService(new OpenAiOptions()
+        var url = modelKey.SupplierKey!.BaseUrl!.Trim();
+        var uri = new Uri(url);
+        var path = uri.AbsolutePath;
+        var subRoute = path.TrimStart('/');
+        var baseUrl = uri.GetLeftPart(UriPartial.Authority);
+        
+        var option = new OpenAiOptions()
         {
             ApiKey = modelKey.SupplierKey!.ApiKey!,
-            BaseDomain = modelKey.SupplierKey.BaseUrl!
-        });
+            BaseDomain = baseUrl,
+        };
+        if (!subRoute.IsNullOrEmpty())
+        {
+            option.ApiVersion = subRoute;
+        }
+        var openAiService = new OpenAIService(option
+        );
+        
         var messages = TransferObject(chatBody.Messages!, chatBody.Vision);
         var completionResult = openAiService.ChatCompletion.CreateCompletionAsStream(new ChatCompletionCreateRequest
         {
