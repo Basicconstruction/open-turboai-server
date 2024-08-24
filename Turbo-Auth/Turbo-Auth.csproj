@@ -8,10 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Anthropic.SDK" Version="3.2.1" />
-        <PackageReference Include="Betalgo.OpenAI" Version="8.2.2" />
-        <PackageReference Include="DashScope" Version="0.9.4" />
-        <PackageReference Include="DotnetGeminiSDK" Version="1.0.14" />
+        
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.0" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
@@ -21,11 +18,17 @@
         </PackageReference>
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
         <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.0-beta.2" />
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.0" />
-        <PackageReference Include="SixLabors.ImageSharp" Version="3.1.4" />
-        <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="2.1.3" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
         <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.6.0" />
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.0" />
+        
+        <PackageReference Include="SixLabors.ImageSharp" Version="3.1.4" />
+        <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="2.1.3" />
+        <PackageReference Include="Anthropic.SDK" Version="3.2.1" />
+        <PackageReference Include="Betalgo.OpenAI" Version="8.2.2" />
+        <PackageReference Include="DashScope" Version="0.9.4" />
+        <PackageReference Include="DotnetGeminiSDK" Version="1.0.14" />
+        
     </ItemGroup>
 
     <ItemGroup>
