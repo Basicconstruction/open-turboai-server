@@ -44,16 +44,12 @@ public class OpenAiChatHandler : IChatHandler
         {
             if (completion.Successful)
             {
-                if (completion.Choices.FirstOrDefault() != null)
+                if (completion.Choices.FirstOrDefault() == null) continue;
+                if (completion.Choices.FirstOrDefault()?.Message == null) continue;
+                if (completion.Choices.FirstOrDefault()?.Message.Content == null) continue;
+                if (completion.Choices.FirstOrDefault()?.Message.Content!.Length > 0)
                 {
-                    if (completion.Choices.FirstOrDefault()?.Message.Content != null)
-                    {
-                        if (completion.Choices.FirstOrDefault()?.Message.Content!.Length > 0)
-                        {
-                            await response.WriteAsync(completion.Choices.FirstOrDefault()?.Message.Content!);
-                        }
-
-                    }
+                    await response.WriteAsync(completion.Choices.FirstOrDefault()?.Message.Content!);
                 }
             }
             else
